@@ -1,35 +1,93 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useAuth } from "./context/AuthContext";
+import Signup from "./pages/Signup";
+import Login from "./pages/Login";
+import ProtectedRoute from "./components/ProtectedRoute";
+import FacultyDashboard from "./pages/FacultyDashboard";
+import StudentDashboard from "./pages/StudentDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
+import FacultyAdvisorDashboard from "./pages/FacultyAdvisorDashboard";
+import CourseDetail from "./pages/CourseDetail";
+import "./App.css";
 
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+function RootRedirect() {
+  const { role } = useAuth();
+  
+  // Map roles to routes (support both old and new role names)
+  const roleMap = {
+    teacher: "/faculty",
+    faculty: "/faculty",
+    student: "/student",
+    admin: "/admin",
+    faculty_advisor: "/advisor",
+  };
+  
+  const route = roleMap[role];
+  if (route) {
+    return <Navigate to={route} replace />;
+  }
+  
+  return <Navigate to="/login" replace />;
 }
 
-export default App
+function App() {
+    return (
+        <BrowserRouter>
+            <Routes>
+                <Route path="/" element={<RootRedirect />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route path="/login" element={<Login />} />
+                <Route
+                    path="/student"
+                    element={
+                        <ProtectedRoute role="student">
+                            <StudentDashboard />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/faculty"
+                    element={
+                        <ProtectedRoute role="faculty">
+                            <FacultyDashboard />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/teacher"
+                    element={
+                        <ProtectedRoute role="teacher">
+                            <FacultyDashboard />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/admin"
+                    element={
+                        <ProtectedRoute role="admin">
+                            <AdminDashboard />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/advisor"
+                    element={
+                        <ProtectedRoute role="faculty_advisor">
+                            <FacultyAdvisorDashboard />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/courses/:id"
+                    element={
+                        <ProtectedRoute>
+                            <CourseDetail />
+                        </ProtectedRoute>
+                    }
+                />
+            </Routes>
+        </BrowserRouter>
+    );
+}
+
+export default App;
