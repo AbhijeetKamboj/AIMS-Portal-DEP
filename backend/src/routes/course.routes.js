@@ -1,0 +1,35 @@
+import express from "express";
+import { authMiddleware } from "../middleware/authMiddleware.js";
+import { requireRole } from "../middleware/roleMiddleware.js";
+import {
+    createCourse,
+    offerCourse,
+    approveOffering,
+    getApprovedOfferings,
+    getAllOfferings,
+    getCourses,
+    getSemesters,
+    getOfferedCourses,
+    getCourseEnrollments
+} from "../controllers/course.controller.js";
+
+const router = express.Router();
+
+router.use(authMiddleware);
+
+// Public (Authenticated)
+router.get("/offerings", getApprovedOfferings);
+router.get("/list", getCourses);
+router.get("/semesters", getSemesters);
+router.get("/offered-courses", getOfferedCourses);
+router.get("/enrollments", getCourseEnrollments);
+
+// Admin Routes
+router.post("/create", requireRole("admin"), createCourse);
+router.post("/approve-offering", requireRole("admin"), approveOffering);
+router.get("/all-offerings", requireRole("admin"), getAllOfferings);
+
+// Faculty Routes
+router.post("/offer", requireRole("faculty"), offerCourse);
+
+export default router;
