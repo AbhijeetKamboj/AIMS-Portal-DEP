@@ -23,22 +23,22 @@ export default function AssignAdvisor() {
     };
 
     return (
-        <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100">
-            <h3 className="text-xl font-bold mb-4 text-gray-800">Assign Faculty Advisor</h3>
-            <div className="space-y-4">
+        <div className="w-full">
+            <h3 className="text-xl font-bold mb-6 text-gray-900 tracking-tight">Assign Faculty Advisor</h3>
+            <div className="space-y-6">
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Student Roll Number</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Student Roll Number</label>
                     <input
-                        className="w-full p-2 border rounded"
-                        placeholder="2023CSB1094"
+                        className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-black focus:ring-0 outline-none transition-all duration-200"
+                        placeholder="e.g. 2023CSB1094"
                         value={form.student_roll}
                         onChange={e => setForm({ ...form, student_roll: e.target.value })}
                     />
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Faculty Email</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Faculty Email</label>
                     <input
-                        className="w-full p-2 border rounded"
+                        className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-black focus:ring-0 outline-none transition-all duration-200"
                         placeholder="faculty@iitrpr.ac.in"
                         value={form.faculty_email}
                         onChange={e => setForm({ ...form, faculty_email: e.target.value })}
@@ -47,7 +47,7 @@ export default function AssignAdvisor() {
                 <button
                     onClick={submit}
                     disabled={loading}
-                    className="w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700"
+                    className="w-full py-3 bg-black text-white rounded-xl font-bold shadow-soft hover:shadow-medium hover:-translate-y-0.5 transition-all duration-200 disabled:bg-gray-300 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none"
                 >
                     {loading ? "Assigning..." : "Assign Advisor"}
                 </button>

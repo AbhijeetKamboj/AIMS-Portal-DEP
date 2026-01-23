@@ -21,30 +21,41 @@ export default function DirectEnroll() {
     };
 
     return (
-        <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100">
-            <h3 className="text-xl font-bold mb-4 text-gray-800">Direct Enroll Student</h3>
-            <div className="space-y-4">
+        <div className="w-full">
+            <h3 className="text-xl font-bold mb-6 text-gray-900 tracking-tight">Direct Enroll Student</h3>
+            <div className="space-y-6">
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Student Roll Number</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Student Roll Number</label>
                     <input
-                        className="w-full p-2 border rounded"
-                        placeholder="2023CS01"
+                        className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-black focus:ring-0 outline-none transition-all duration-200"
+                        placeholder="e.g. 2023CS01"
                         value={form.roll_number}
                         onChange={e => setForm({ ...form, roll_number: e.target.value })}
                     />
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Offering ID</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Offering ID</label>
                     <input
                         type="number"
-                        className="w-full p-2 border rounded"
+                        className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-black focus:ring-0 outline-none transition-all duration-200"
                         placeholder="e.g. 10"
                         value={form.offering_id}
                         onChange={e => setForm({ ...form, offering_id: e.target.value })}
                     />
                 </div>
-                <button onClick={submit} disabled={loading} className="w-full bg-green-600 text-white py-2 rounded">
-                    {loading ? "Enrolling..." : "Enroll Student"}
+                <button 
+                    onClick={submit} 
+                    disabled={loading} 
+                    className="w-full py-3 bg-black text-white rounded-xl font-bold shadow-soft hover:shadow-medium hover:-translate-y-0.5 transition-all duration-200 disabled:bg-gray-300 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none"
+                >
+                    {loading ? (
+                        <div className="flex items-center justify-center gap-2">
+                            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                            <span>Enrolling...</span>
+                        </div>
+                    ) : (
+                        "Enroll Student"
+                    )}
                 </button>
             </div>
         </div>

@@ -28,19 +28,19 @@ export default function CreateUser() {
     const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
     return (
-        <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100">
-            <h3 className="text-xl font-bold mb-4 text-gray-800">Create New User</h3>
+        <div className="w-full">
+            <h3 className="text-xl font-bold mb-6 text-gray-900 tracking-tight">Create New User</h3>
 
             {/* User Type Toggle */}
-            <div className="flex mb-6 bg-gray-100 p-1 rounded-lg">
+            <div className="flex mb-6 bg-gray-100 p-1 rounded-xl">
                 <button
-                    className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${type === "student" ? "bg-white shadow text-indigo-600" : "text-gray-500 hover:text-gray-700"}`}
+                    className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all duration-200 ${type === "student" ? "bg-white shadow-soft text-black" : "text-gray-500 hover:text-gray-900"}`}
                     onClick={() => setType("student")}
                 >
                     Student
                 </button>
                 <button
-                    className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${type === "faculty" ? "bg-white shadow text-indigo-600" : "text-gray-500 hover:text-gray-700"}`}
+                    className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all duration-200 ${type === "faculty" ? "bg-white shadow-soft text-black" : "text-gray-500 hover:text-gray-900"}`}
                     onClick={() => setType("faculty")}
                 >
                     Faculty
@@ -49,34 +49,36 @@ export default function CreateUser() {
 
             <div className="space-y-4">
                 {/* Common Fields */}
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                    <input
-                        name="name"
-                        className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
-                        placeholder="John Doe"
-                        value={form.name || ""}
-                        onChange={handleChange}
-                    />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                        <input
+                            name="name"
+                            className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-black focus:ring-0 outline-none transition-all duration-200"
+                            placeholder="John Doe"
+                            value={form.name || ""}
+                            onChange={handleChange}
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                        <input
+                            name="email"
+                            type="email"
+                            className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-black focus:ring-0 outline-none transition-all duration-200"
+                            placeholder="john@example.com"
+                            value={form.email || ""}
+                            onChange={handleChange}
+                        />
+                    </div>
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-                    <input
-                        name="email"
-                        type="email"
-                        className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
-                        placeholder="john@example.com"
-                        value={form.email || ""}
-                        onChange={handleChange}
-                    />
-                </div>
-
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Department</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Department</label>
                     <input
                         name="department"
-                        className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                        className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-black focus:ring-0 outline-none transition-all duration-200"
                         placeholder="e.g. CSE"
                         value={form.department || ""}
                         onChange={handleChange}
@@ -87,21 +89,21 @@ export default function CreateUser() {
                 {type === "student" ? (
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Roll Number</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Roll Number</label>
                             <input
                                 name="roll_number"
-                                className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                                className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-black focus:ring-0 outline-none transition-all duration-200"
                                 placeholder="2023CS01"
                                 value={form.roll_number || ""}
                                 onChange={handleChange}
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Batch</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Batch</label>
                             <input
                                 name="batch"
                                 type="number"
-                                className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                                className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-black focus:ring-0 outline-none transition-all duration-200"
                                 placeholder="2023"
                                 value={form.batch || ""}
                                 onChange={handleChange}
@@ -110,10 +112,10 @@ export default function CreateUser() {
                     </div>
                 ) : (
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Employee ID</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Employee ID</label>
                         <input
                             name="employee_id"
-                            className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                            className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-black focus:ring-0 outline-none transition-all duration-200"
                             placeholder="EMP001"
                             value={form.employee_id || ""}
                             onChange={handleChange}
@@ -124,8 +126,7 @@ export default function CreateUser() {
                 <button
                     onClick={submit}
                     disabled={loading}
-                    className={`w-full py-2.5 rounded-lg text-white font-medium shadow-md transition-all 
-                ${loading ? "bg-indigo-400 cursor-not-allowed" : "bg-indigo-600 hover:bg-indigo-700 active:scale-95"}`}
+                    className="w-full py-3 mt-4 bg-black text-white rounded-xl font-bold shadow-soft hover:shadow-medium hover:-translate-y-0.5 transition-all duration-200 disabled:bg-gray-300 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none"
                 >
                     {loading ? "Creating..." : `Create ${type === "student" ? "Student" : "Faculty"}`}
                 </button>

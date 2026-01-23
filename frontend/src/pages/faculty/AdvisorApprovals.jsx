@@ -29,11 +29,38 @@ export default function AdvisorApprovals() {
         }
     };
 
-    if (!requests.length) return null;
+    const handleApproveAll = async () => {
+        setLoading(true);
+        try {
+            const res = await apiFetch("/faculty/advisor-approve-all", "POST", {});
+            if (res.error) throw new Error(res.error);
+            toast.success("All pending requests approved");
+            fetchRequests();
+        } catch (err) {
+            toast.error(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (!requests.length) return (
+        <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100 mt-6 text-center text-gray-500">
+            No pending advisor approvals.
+        </div>
+    );
 
     return (
         <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100 mt-6">
-            <h3 className="text-xl font-bold mb-4 text-gray-800">Pending Advisor Approvals</h3>
+            <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xl font-bold text-gray-800">Pending Advisor Approvals</h3>
+                <button
+                    onClick={handleApproveAll}
+                    disabled={loading}
+                    className="px-4 py-2 bg-black text-white rounded-lg text-sm font-bold hover:bg-gray-800 disabled:opacity-50 transition"
+                >
+                    {loading ? 'Processing...' : 'Approve All Pending'}
+                </button>
+            </div>
             <div className="space-y-3">
                 {requests.map((req, idx) => (
                     <div key={idx} className="flex justify-between items-center p-3 bg-blue-50 rounded border border-blue-100">

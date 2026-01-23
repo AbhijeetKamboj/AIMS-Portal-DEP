@@ -76,78 +76,134 @@ export default function OfferCourse() {
     };
 
     return (
-        <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100">
-            <h3 className="text-xl font-bold mb-4 text-gray-800">Offer a Course</h3>
-            <div className="space-y-4">
+        <div className="w-full max-w-4xl mx-auto">
+            <h3 className="text-xl font-bold mb-6 text-gray-900 tracking-tight">Offer New Course</h3>
 
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Semester</label>
-                    <select
-                        className="w-full p-2 border rounded"
-                        value={form.semester_id}
-                        onChange={e => setForm({ ...form, semester_id: e.target.value, course_id: "" })}
-                    >
-                        <option value="">-- Choose Semester First --</option>
-                        {semesters.map(s => (
-                            <option key={s.id} value={s.id}>{s.name} ({s.start_date})</option>
-                        ))}
-                    </select>
-                </div>
+            <div className="space-y-6">
 
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Select Course</label>
-                    <select
-                        className="w-full p-2 border rounded"
-                        value={form.course_id}
-                        onChange={e => setForm({ ...form, course_id: e.target.value })}
-                        disabled={!form.semester_id}
-                    >
-                        <option value="">{form.semester_id ? "-- Choose Course --" : "Select Semester First"}</option>
-                        {availableCourses.map(c => (
-                            <option key={c.id} value={c.id}>{c.course_code}: {c.course_name}</option>
-                        ))}
-                    </select>
-                    {form.semester_id && <p className="text-xs text-gray-500 mt-1">Showing only courses not yet offered this semester.</p>}
-                </div>
-
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Offering Department</label>
-                    <select
-                        className="w-full p-2 border rounded"
-                        value={form.offering_dept_id}
-                        onChange={e => setForm({ ...form, offering_dept_id: e.target.value })}
-                    >
-                        <option value="">-- Choose Department --</option>
-                        {departments.map(d => (
-                            <option key={d.id} value={d.id}>{d.code} - {d.name}</option>
-                        ))}
-                    </select>
-                </div>
-
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Allowed Enrollment (ACL)</label>
-                    <div className="p-3 border rounded bg-gray-50 h-32 overflow-y-auto grid grid-cols-2 gap-2">
-                        {departments.map(d => (
-                            <label key={d.id} className="flex items-center gap-2 cursor-pointer">
-                                <input
-                                    type="checkbox"
-                                    checked={form.allowed_dept_ids.includes(d.id)}
-                                    onChange={() => toggleDept(d.id)}
-                                    className="rounded text-indigo-600 focus:ring-indigo-500"
-                                />
-                                <span className="text-sm text-gray-700">{d.code}</span>
-                            </label>
-                        ))}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Semester Selection */}
+                    <div className="space-y-2">
+                        <label className="block text-sm font-bold text-gray-700">Target Semester</label>
+                        <div className="relative">
+                            <select
+                                className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl appearance-none focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all font-medium text-gray-900"
+                                value={form.semester_id}
+                                onChange={e => setForm({ ...form, semester_id: e.target.value, course_id: "" })}
+                            >
+                                <option value="">Select Semester...</option>
+                                {semesters.map(s => (
+                                    <option key={s.id} value={s.id}>{s.name} ({s.start_date})</option>
+                                ))}
+                            </select>
+                            <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none">
+                                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </div>
+                        </div>
                     </div>
-                    <div className="flex gap-2 mt-1">
-                        <button onClick={() => setForm(p => ({ ...p, allowed_dept_ids: departments.map(d => d.id) }))} className="text-xs text-indigo-600 hover:underline">Select All</button>
-                        <button onClick={() => setForm(p => ({ ...p, allowed_dept_ids: [] }))} className="text-xs text-red-600 hover:underline">Clear</button>
+
+                    {/* Department Selection */}
+                    <div className="space-y-2">
+                        <label className="block text-sm font-bold text-gray-700">Offering Department</label>
+                        <div className="relative">
+                            <select
+                                className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl appearance-none focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all font-medium text-gray-900"
+                                value={form.offering_dept_id}
+                                onChange={e => setForm({ ...form, offering_dept_id: e.target.value })}
+                            >
+                                <option value="">Select Department...</option>
+                                {departments.map(d => (
+                                    <option key={d.id} value={d.id}>{d.code} - {d.name}</option>
+                                ))}
+                            </select>
+                            <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none">
+                                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <button onClick={submit} disabled={loading} className="w-full bg-indigo-600 text-white py-2 rounded">
-                    {loading ? "Submitting..." : "Offer Course"}
-                </button>
+                {/* Course Selection */}
+                <div className="space-y-2">
+                    <label className="block text-sm font-bold text-gray-700">Courses</label>
+                    <div className="relative">
+                        <select
+                            className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl appearance-none focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all font-medium text-gray-900 disabled:bg-gray-50 disabled:text-gray-400"
+                            value={form.course_id}
+                            onChange={e => setForm({ ...form, course_id: e.target.value })}
+                            disabled={!form.semester_id}
+                        >
+                            <option value="">{form.semester_id ? "Select Course to Offer..." : "Please select a semester first"}</option>
+                            {availableCourses.map(c => (
+                                <option key={c.id} value={c.id}>{c.course_code}: {c.course_name}</option>
+                            ))}
+                        </select>
+                        <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none">
+                            <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                    </div>
+                    {form.semester_id && <p className="text-xs text-gray-500 px-1">Note: Showing only courses not yet active in this semester.</p>}
+                </div>
+
+                {/* Slot Selection */}
+                <div className="space-y-2">
+                    <label className="block text-sm font-bold text-gray-700">Time Slot</label>
+                    <input
+                        type="text"
+                        className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all font-medium text-gray-900"
+                        placeholder="e.g. A, B, Mon 10-11"
+                        value={form.slot || ''}
+                        onChange={e => setForm({ ...form, slot: e.target.value })}
+                    />
+                </div>
+
+                {/* Enrollment Restrictions */}
+                <div className="space-y-3">
+                    <div className="flex justify-between items-end">
+                        <label className="block text-sm font-bold text-gray-700">Allowed Departments (ACL)</label>
+                        <div className="flex gap-3 text-sm">
+                            <button onClick={() => setForm(p => ({ ...p, allowed_dept_ids: departments.map(d => d.id) }))} className="text-gray-600 hover:text-black font-medium underline decoration-dotted">Select All</button>
+                            <button onClick={() => setForm(p => ({ ...p, allowed_dept_ids: [] }))} className="text-gray-600 hover:text-red-600 font-medium underline decoration-dotted">Clear</button>
+                        </div>
+                    </div>
+
+                    <div className="p-4 border border-gray-200 rounded-xl bg-gray-50 max-h-48 overflow-y-auto">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                            {departments.map(d => (
+                                <label
+                                    key={d.id}
+                                    className={`
+                                        flex items-center justify-center px-3 py-2 rounded-lg border cursor-pointer transition-all duration-200 text-sm font-bold
+                                        ${form.allowed_dept_ids.includes(d.id)
+                                            ? "bg-black text-white border-black shadow-md -translate-y-0.5"
+                                            : "bg-white text-gray-600 border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                                        }
+                                    `}
+                                >
+                                    <input
+                                        type="checkbox"
+                                        checked={form.allowed_dept_ids.includes(d.id)}
+                                        onChange={() => toggleDept(d.id)}
+                                        className="hidden"
+                                    />
+                                    {d.code}
+                                </label>
+                            ))}
+                        </div>
+                    </div>
+                    <p className="text-xs text-gray-400">Students belonging to these departments will be allowed to enroll.</p>
+                </div>
+
+                <div className="pt-4">
+                    <button
+                        onClick={submit}
+                        disabled={loading}
+                        className="w-full py-4 bg-black text-white rounded-xl font-bold shadow-soft hover:shadow-medium hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:hover:translate-y-0 disabled:shadow-none"
+                    >
+                        {loading ? "Submitting Proposal..." : "Submit Offering Proposal"}
+                    </button>
+                </div>
+
             </div>
         </div>
     );

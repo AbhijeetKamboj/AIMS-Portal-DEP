@@ -36,5 +36,12 @@ export default function RoleLoader() {
     resolveRole();
   }, [navigate]);
 
-  return null;
+  return (
+    <div className="fixed inset-0 bg-white flex items-center justify-center z-50">
+      <div className="flex flex-col items-center gap-4">
+        <div className="w-12 h-12 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-gray-500 font-medium animate-pulse">Verifying Access...</p>
+      </div>
+    </div>
+  );
 }

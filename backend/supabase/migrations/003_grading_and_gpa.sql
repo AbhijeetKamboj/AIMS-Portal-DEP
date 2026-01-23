@@ -7,7 +7,7 @@ CREATE TABLE grade_scale (
 INSERT INTO grade_scale VALUES
 ('A', 10.00),
 ('A-', 9.00),
-('B+', 8.00),
+('B', 8.00),
 ('B-', 7.00),
 ('C', 6.00),
 ('C-', 5.00),

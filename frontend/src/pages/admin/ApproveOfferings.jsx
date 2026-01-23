@@ -7,9 +7,9 @@ export default function ApproveOfferings() {
     const [loading, setLoading] = useState(false);
 
     const fetchOfferings = async () => {
-        const res = await apiFetch("/courses/all-offerings"); // Admin endpoint
+        const res = await apiFetch("/courses/all-offerings");
         if (!res.error) {
-            setOfferings(res.filter(o => o.status === 'pending')); // Only show pending
+            setOfferings(res.filter(o => o.status === 'pending'));
         }
     };
 
@@ -23,7 +23,7 @@ export default function ApproveOfferings() {
             const res = await apiFetch("/courses/approve-offering", "POST", { offering_id, status });
             if (res.error) throw new Error(res.error);
             toast.success(`Offering ${status}`);
-            fetchOfferings(); // Refresh
+            fetchOfferings();
         } catch (err) {
             toast.error(err.message);
         } finally {
@@ -31,23 +31,80 @@ export default function ApproveOfferings() {
         }
     };
 
-    if (!offerings.length) return null; // Hide if no pending offerings
+    const handleApproveAll = async () => {
+        if (!offerings.length) return;
+        setLoading(true);
+        try {
+            // Approve all pending offerings one by one
+            for (const offering of offerings) {
+                await apiFetch("/courses/approve-offering", "POST", {
+                    offering_id: offering.id,
+                    status: 'approved'
+                });
+            }
+            toast.success(`Approved all ${offerings.length} offerings`);
+            fetchOfferings();
+        } catch (err) {
+            toast.error(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (!offerings.length) return (
+         <div className="w-full text-center py-12 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+            <p className="text-gray-400 font-medium">No pending course offerings found.</p>
+        </div>
+    );
 
     return (
-        <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100 mt-6">
-            <h3 className="text-xl font-bold mb-4 text-gray-800">Pending Course Offerings</h3>
+        <div className="w-full">
+            <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-bold text-gray-900 tracking-tight">Pending Course Offerings</h3>
+                <button
+                    onClick={handleApproveAll}
+                    disabled={loading}
+                    className="px-4 py-2 bg-black text-white rounded-lg text-sm font-bold shadow-soft hover:shadow-medium hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 flex items-center gap-2"
+                >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                    Approve All ({offerings.length})
+                </button>
+            </div>
 
-            <div className="space-y-3">
+            <div className="space-y-4">
                 {offerings.map(offering => (
-                    <div key={offering.id} className="flex justify-between items-center p-3 bg-gray-50 rounded border">
-                        <div>
-                            <p className="font-semibold">{offering.courses.course_code}: {offering.courses.course_name}</p>
-                            <p className="text-sm text-gray-600">Faculty: {offering.faculty?.users?.name} | Credits: {offering.courses.credits}</p>
-                            <p className="text-xs text-gray-500">L:{offering.courses.l} T:{offering.courses.t} P:{offering.courses.p} S:{offering.courses.s}</p>
+                    <div key={offering.id} className="flex flex-col sm:flex-row justify-between items-center p-5 bg-white rounded-xl border border-gray-100 shadow-soft hover:shadow-medium transition-all duration-300">
+                        <div className="mb-4 sm:mb-0">
+                            <div className="flex items-center gap-3 mb-1">
+                                <span className="bg-gray-100 text-gray-800 px-2 py-0.5 rounded text-xs font-bold border border-gray-200">{offering.courses.course_code}</span>
+                                <h4 className="font-bold text-gray-900 text-lg">{offering.courses.course_name}</h4>
+                            </div>
+                            <div className="flex items-center gap-4 text-sm text-gray-500">
+                                <span className="font-medium flex items-center gap-1">
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                                    {offering.faculty?.users?.name}
+                                </span>
+                                <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
+                                <span className="font-medium">{offering.courses.credits} Credits</span>
+                                <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
+                                <span className="font-mono text-xs bg-gray-50 px-1 rounded border border-gray-100">L:{offering.courses.l} T:{offering.courses.t} P:{offering.courses.p} S:{offering.courses.s}</span>
+                            </div>
                         </div>
-                        <div className="flex gap-2">
-                            <button onClick={() => handleAction(offering.id, 'approved')} className="px-3 py-1 bg-green-100 text-green-700 rounded text-sm hover:bg-green-200">Approve</button>
-                            <button onClick={() => handleAction(offering.id, 'rejected')} className="px-3 py-1 bg-red-100 text-red-700 rounded text-sm hover:bg-red-200">Reject</button>
+                        <div className="flex gap-3 w-full sm:w-auto">
+                            <button
+                                onClick={() => handleAction(offering.id, 'rejected')}
+                                disabled={loading}
+                                className="flex-1 sm:flex-none px-4 py-2 bg-white text-red-600 border border-gray-200 hover:border-red-200 hover:bg-red-50 rounded-lg text-sm font-bold transition-all disabled:opacity-50"
+                            >
+                                Reject
+                            </button>
+                            <button
+                                onClick={() => handleAction(offering.id, 'approved')}
+                                disabled={loading}
+                                className="flex-1 sm:flex-none px-4 py-2 bg-black text-white rounded-lg text-sm font-bold hover:bg-gray-800 transition-all shadow-sm active:translate-y-0.5 disabled:opacity-50"
+                            >
+                                Approve
+                            </button>
                         </div>
                     </div>
                 ))}

@@ -10,6 +10,7 @@ import {
     getCourses,
     getSemesters,
     getOfferedCourses,
+    approveCourseCatalog,
     getCourseEnrollments
 } from "../controllers/course.controller.js";
 
@@ -25,8 +26,9 @@ router.get("/offered-courses", getOfferedCourses);
 router.get("/enrollments", getCourseEnrollments);
 
 // Admin Routes
-router.post("/create", requireRole("admin"), createCourse);
+router.post("/create", requireRole(["faculty", "admin"]), createCourse);
 router.post("/approve-offering", requireRole("admin"), approveOffering);
+router.post("/approve-catalog", requireRole("admin"), approveCourseCatalog);
 router.get("/all-offerings", requireRole("admin"), getAllOfferings);
 
 // Faculty Routes

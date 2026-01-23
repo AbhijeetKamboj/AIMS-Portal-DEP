@@ -1,4 +1,3 @@
-
 import { supabaseAdmin } from "../config/supabaseAdmin.js";
 
 export const lockSemester = async (req, res) => {
@@ -101,72 +100,73 @@ export const createFaculty = async (req, res) => {
     }
 };
 
-export const uploadGrades = async (req, res) => {
-    const { grades } = req.body; // Expects [{ roll_number, course_code, semester_id, grade }]
+// Admin: Approve Pending Grades
+export const approveGrades = async (req, res) => {
+    const { grade_ids } = req.body; // Array of grade IDs to approve
 
-    if (!grades || !Array.isArray(grades)) {
-        return res.status(400).json({ error: "Invalid input format. Expected array of grades." });
+    if (!grade_ids || !Array.isArray(grade_ids) || grade_ids.length === 0) {
+        return res.status(400).json({ error: "grade_ids array required" });
     }
 
-    const results = { success: 0, failed: 0, errors: [] };
+    const { error } = await supabaseAdmin
+        .from("grades")
+        .update({ status: 'approved', approved_at: new Date().toISOString() })
+        .in("id", grade_ids);
 
-    for (const item of grades) {
-        const { roll_number, course_code, semester_id, grade } = item;
+    if (error) return res.status(400).json({ error: error.message });
 
-        try {
-            // 1. Get Student ID
-            const { data: student, error: sErr } = await supabaseAdmin
+    res.json({ message: "Grades approved successfully" });
+};
+
+export const getPendingGrades = async (req, res) => {
+    try {
+        const { data, error } = await supabaseAdmin
+            .from("grades")
+            .select(`
+                id,
+                student_id,
+                offering_id,
+                grade,
+                submitted_at,
+                status
+            `)
+            .eq("status", "pending");
+
+        if (error) throw error;
+
+        // Enrich with related data
+        const enrichedData = await Promise.all((data || []).map(async (g) => {
+            // Get student info
+            const { data: student } = await supabaseAdmin
                 .from("students")
-                .select("user_id")
-                .eq("roll_number", roll_number)
+                .select("roll_number, users(name)")
+                .eq("user_id", g.student_id)
                 .single();
 
-            if (sErr || !student) throw new Error(`Student ${roll_number} not found`);
-
-            // 2. Get Course ID
-            const { data: course, error: cErr } = await supabaseAdmin
-                .from("courses")
-                .select("id")
-                .eq("course_code", course_code)
-                .single();
-
-            if (cErr || !course) throw new Error(`Course ${course_code} not found`);
-
-            // 3. Get Offering ID (assuming semester_id provided is valid)
-            // We need to find the offering for this course in this semester.
-            // If multiple offerings exist (e.g. diff faculty), this logic might need refinement to pick one.
-            // For now, assuming 1 offering per course per semester or picking the first one.
-
-            const { data: offering, error: oErr } = await supabaseAdmin
+            // Get offering info
+            const { data: offering } = await supabaseAdmin
                 .from("course_offerings")
-                .select("id")
-                .eq("course_id", course.id)
-                .eq("semester_id", semester_id)
-                .limit(1)
+                .select("courses(course_code, course_name), faculty(users(name)), semesters(name)")
+                .eq("id", g.offering_id)
                 .single();
 
-            if (oErr || !offering) throw new Error(`Offering for ${course_code} in sem ${semester_id} not found`);
+            return {
+                ...g,
+                students: student,
+                course_offerings: offering
+            };
+        }));
 
-            // 4. Upsert Grade
-            const { error: gErr } = await supabaseAdmin
-                .from("grades")
-                .upsert({
-                    student_id: student.user_id,
-                    offering_id: offering.id,
-                    grade
-                }, { onConflict: 'student_id, offering_id' });
-
-            if (gErr) throw gErr;
-
-            results.success++;
-
-        } catch (err) {
-            results.failed++;
-            results.errors.push({ item, error: err.message });
-        }
+        res.json(enrichedData);
+    } catch (error) {
+        console.error("getPendingGrades Error:", error);
+        res.status(400).json({ error: error.message });
     }
+};
 
-    res.json({ message: "Grade upload processed", results });
+// Deprecated: Old Admin CSV Upload (Removed as per request)
+export const uploadGrades = async (req, res) => {
+    return res.status(410).json({ error: "Admin grade upload is deprecated. Faculty must upload grades." });
 };
 
 export const assignAdvisor = async (req, res) => {
@@ -213,7 +213,106 @@ export const assignAdvisor = async (req, res) => {
     res.json({ message: "Advisor assigned successfully" });
 };
 
-// Admin: Submit grade for a student
+// Bulk Create Users (Admin)
+export const bulkCreateUsers = async (req, res) => {
+    const { users } = req.body; // Array of { email, password, name, role_id, ...additional_info }
+
+    if (!users || !Array.isArray(users)) {
+        return res.status(400).json({ error: "Users array is required" });
+    }
+
+    const results = { success: 0, failed: 0, errors: [] };
+
+    for (const user of users) {
+        try {
+            // Determine Role ID: 1=Student, 2=Faculty, 3=Admin, 4=Advisor?
+            // User input should specify or we deduce.
+            // Let's assume CSV provides everything.
+
+            // Create Auth User
+            const authUser = await createAuthUser(user.email, user.password || "Start123!", user.name, user.role_id);
+
+            // Insert into specific role table
+            if (user.role_id == 1) { // Student
+                const { error } = await supabaseAdmin.from("students").insert({
+                    user_id: authUser.id,
+                    roll_number: user.roll_number,
+                    department: user.department,
+                    batch: user.batch
+                });
+                if (error) throw error;
+
+            } else if (user.role_id == 2) { // Faculty
+                const { error } = await supabaseAdmin.from("faculty").insert({
+                    user_id: authUser.id,
+                    employee_id: user.employee_id,
+                    department: user.department
+                });
+                if (error) throw error;
+            }
+
+            results.success++;
+        } catch (err) {
+            console.error(`Failed to create user ${user.email}:`, err);
+            results.failed++;
+            results.errors.push({ email: user.email, error: err.message });
+        }
+    }
+
+    res.json({ message: "Bulk creation completed", results });
+};
+
+// Bulk Assign Advisors
+export const bulkAssignAdvisors = async (req, res) => {
+    const { assignments } = req.body; // Array of { student_roll, faculty_email }
+
+    if (!assignments || !Array.isArray(assignments)) {
+        return res.status(400).json({ error: "Assignments array is required" });
+    }
+
+    const results = { success: 0, failed: 0, errors: [] };
+
+    for (const item of assignments) {
+        try {
+            // Reuse logic? Or optimized batch? Loop for now.
+            // 1. Find Student
+            const { data: student, error: sErr } = await supabaseAdmin
+                .from("students")
+                .select("user_id")
+                .eq("roll_number", item.student_roll)
+                .single();
+
+            if (sErr || !student) throw new Error(`Student ${item.student_roll} not found`);
+
+            // 2. Find Faculty
+            const { data: facultyUser, error: fErr } = await supabaseAdmin
+                .from("users")
+                .select("id")
+                .eq("email", item.faculty_email)
+                .single();
+
+            if (fErr || !facultyUser) throw new Error(`Faculty ${item.faculty_email} not found`);
+
+            // 3. Upsert Assignment
+            const { error } = await supabaseAdmin
+                .from("faculty_advisors")
+                .upsert({
+                    student_id: student.user_id,
+                    faculty_id: facultyUser.id
+                });
+
+            if (error) throw error;
+
+            results.success++;
+        } catch (err) {
+            results.failed++;
+            results.errors.push({ ...item, error: err.message });
+        }
+    }
+
+    res.json({ message: "Bulk assignment completed", results });
+};
+
 export const adminSubmitGrade = async (req, res) => {
     const { student_id, offering_id, grade } = req.body;
 
@@ -255,4 +354,3 @@ export const adminSubmitGrade = async (req, res) => {
 
     res.json({ message: "Grade submitted successfully" });
 };
-

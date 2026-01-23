@@ -11,14 +11,6 @@ export default function CreateCourse() {
     });
     const [loading, setLoading] = useState(false);
 
-    const calculateCredits = (l, t, p, s) => {
-        // Typical formula, but keeping manual override or auto-calc based on inputs
-        // Assuming credits = L + T + P/2 + S/2 or similar? 
-        // For now, let user input credits manually or just default.
-        // Actually user requirement said LTPSC at creation.
-        return +l + +t + +p + +s; // Simple sum for now? Or just let user type.
-    };
-
     const handleChange = (e) => {
         const { name, value } = e.target;
         setForm(prev => ({ ...prev, [name]: value }));
@@ -44,40 +36,59 @@ export default function CreateCourse() {
     };
 
     return (
-        <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100">
-            <h3 className="text-xl font-bold mb-4 text-gray-800">Create New Course</h3>
+        <div className="w-full">
+            <h3 className="text-xl font-bold mb-6 text-gray-900 tracking-tight">Create New Course</h3>
 
-            <div className="grid grid-cols-2 gap-4 mb-4">
-                <input name="course_code" placeholder="Course Code (CS101)" value={form.course_code} onChange={handleChange} className="p-2 border rounded" />
-                <input name="course_name" placeholder="Course Name" value={form.course_name} onChange={handleChange} className="p-2 border rounded" />
+            <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="md:col-span-1">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Course Code</label>
+                        <input
+                            name="course_code"
+                            placeholder="e.g. CS101"
+                            value={form.course_code}
+                            onChange={handleChange}
+                            className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-black focus:ring-0 outline-none transition-all duration-200"
+                        />
+                    </div>
+                    <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Course Name</label>
+                        <input
+                            name="course_name"
+                            placeholder="e.g. Introduction to Programming"
+                            value={form.course_name}
+                            onChange={handleChange}
+                            className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-black focus:ring-0 outline-none transition-all duration-200"
+                        />
+                    </div>
+                </div>
+
+                <div className="bg-gray-50 rounded-xl p-6 border border-gray-100">
+                    <label className="block text-sm font-bold text-gray-400 uppercase tracking-wide mb-4">Course Structure</label>
+                    <div className="grid grid-cols-5 gap-4">
+                        {['l', 't', 'p', 's', 'credits'].map((field) => (
+                            <div key={field}>
+                                <label className="block text-xs font-bold text-gray-500 uppercase mb-2 text-center">{field}</label>
+                                <input
+                                    name={field}
+                                    type="number"
+                                    value={form[field]}
+                                    onChange={handleChange}
+                                    className={`w-full text-center px-4 py-3 rounded-xl border border-gray-200 focus:ring-0 outline-none transition-all duration-200 ${field === 'credits' ? 'bg-black text-white font-bold border-black' : 'bg-white focus:bg-white focus:border-black'}`}
+                                />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                <button
+                    onClick={submit}
+                    disabled={loading}
+                    className="w-full py-3 bg-black text-white rounded-xl font-bold shadow-soft hover:shadow-medium hover:-translate-y-0.5 transition-all duration-200 disabled:bg-gray-300 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none"
+                >
+                    {loading ? "Creating..." : "Create Course"}
+                </button>
             </div>
-
-            <div className="grid grid-cols-5 gap-2 mb-4">
-                <div>
-                    <label className="text-xs text-gray-500">L</label>
-                    <input name="l" type="number" value={form.l} onChange={handleChange} className="w-full p-2 border rounded" />
-                </div>
-                <div>
-                    <label className="text-xs text-gray-500">T</label>
-                    <input name="t" type="number" value={form.t} onChange={handleChange} className="w-full p-2 border rounded" />
-                </div>
-                <div>
-                    <label className="text-xs text-gray-500">P</label>
-                    <input name="p" type="number" value={form.p} onChange={handleChange} className="w-full p-2 border rounded" />
-                </div>
-                <div>
-                    <label className="text-xs text-gray-500">S</label>
-                    <input name="s" type="number" value={form.s} onChange={handleChange} className="w-full p-2 border rounded" />
-                </div>
-                <div>
-                    <label className="text-xs text-gray-500">Credits</label>
-                    <input name="credits" type="number" value={form.credits} onChange={handleChange} className="w-full p-2 border rounded" />
-                </div>
-            </div>
-
-            <button onClick={submit} disabled={loading} className="w-full bg-indigo-600 text-white py-2 rounded">
-                {loading ? "Creating..." : "Create Course"}
-            </button>
         </div>
     );
 }

@@ -5,96 +5,89 @@ export default function StudentProfileHeader() {
     const [profile, setProfile] = useState(null);
 
     useEffect(() => {
-        // We assume /auth/me or similar gives us details, but let's just fetch transcript or student details
-        // Ideally we need a /student/profile endpoint. For now, I'll use what I have or mock slightly if name missing
-        // Actually `getTranscript` usually has student info. Let's try that or just use auth context if I had it globally
-        // I will add a simple useEffect to fetch basic details if not available.
-        // For now, let's use a new endpoint or existing one.
-        // I'll assume we can pass props or fetch here. 
-        // Let's rely on `transcript` endpoint which often has student details in generic systems, 
-        // but here `getTranscript` calls a stored proc. 
-        // I'll fetch `auth/me` logic here or just fetch from student-specific route?
-        // Let's mock a bit for the UI structure if data fetch is complex, but wait, `apiFetch('/student/transcript')` 
-        // returns data that *could* have header info.
-        // Let's just create the UI assuming props are passed or fetched.
-
-        // I will create a fetcher for profile.
         async function load() {
-            // Quick fetch to get student details. 
-            // Since I don't have a dedicated profile endpoint, I'll deduce from what I can get.
-            // Actually, I'll just use the `transcript` data if it contains it, or add a small helper.
-            // Let's assumes we use a new simple fetch or just display "Loading..."
-            // I will implement a quick fetch to student/transcript which I know exists.
             const res = await apiFetch("/student/transcript");
             if (!res.error) {
-                setProfile(res); // Assuming transcript RPC returns some user details or we can extract.
+                setProfile(res);
             }
         }
         load();
     }, []);
 
-    if (!profile) return <div className="p-4 bg-gray-100 rounded animate-pulse h-32"></div>;
+    if (!profile) {
+        return (
+            <div className="card p-6 mb-6 animate-pulse">
+                <div className="flex items-start space-x-4">
+                    <div className="w-20 h-20 bg-gray-200 rounded-full"></div>
+                    <div className="flex-1 space-y-3">
+                        <div className="h-6 bg-gray-200 rounded w-1/3"></div>
+                        <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
-    // Mocking slightly if RPC structure isn't perfect, but trying to match screenshot fields
-    // Screenshot has: First Name, Last Name, Roll No, Degree (B.Tech), Email, Dept, Year, Category
-    const user = profile.student_info || {}; // Adjust based on RPC return
-    // If RPC just returns grades, I might need to adjust. 
-    // For now, I'll render a static-ish header structure using potentially missing data gracefully.
+    const user = profile.student_info || {};
 
     return (
-        <div className="bg-white p-4 rounded shadow-sm border mb-4 text-sm font-sans">
-            <h3 className="font-bold text-gray-700 border-b pb-2 mb-3">Student Details</h3>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-
-                <div>
-                    <label className="block text-gray-500 text-xs text-transform uppercase">Name</label>
-                    <div className="bg-gray-100 p-2 rounded text-gray-800 font-medium h-9 flex items-center">
-                        {user.name || "ABHIJEET SINGH"} {/* Fallback for demo */}
+        <div className="card p-6 mb-6">
+            <div className="flex items-start space-x-6">
+                {/* Avatar */}
+                <div className="flex-shrink-0">
+                    <div className="w-20 h-20 bg-gradient-primary rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+                        {(user.name || "A")[0].toUpperCase()}
                     </div>
                 </div>
 
-                <div>
-                    <label className="block text-gray-500 text-xs text-transform uppercase">Roll No.</label>
-                    <div className="bg-gray-100 p-2 rounded text-gray-800 font-medium h-9 flex items-center">
-                        {user.roll_number || "2023CSB1094"}
+                {/* Profile Info */}
+                <div className="flex-1">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-1">
+                        {user.name || "Student Name"}
+                    </h2>
+                    <p className="text-gray-500 text-sm mb-4">
+                        {user.roll_number || "Roll Number"} • {user.department || "Department"}
+                    </p>
+
+                    {/* Info Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div>
+                            <label className="block text-xs font-medium text-gray-500 uppercase mb-1">
+                                Email
+                            </label>
+                            <div className="text-sm text-gray-900">
+                                {user.email || "email@example.com"}
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="block text-xs font-medium text-gray-500 uppercase mb-1">
+                                Degree
+                            </label>
+                            <div className="text-sm text-gray-900">
+                                B.Tech
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="block text-xs font-medium text-gray-500 uppercase mb-1">
+                                Year of Entry
+                            </label>
+                            <div className="text-sm text-gray-900">
+                                {user.batch || "2023"}
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="block text-xs font-medium text-gray-500 uppercase mb-1">
+                                Status
+                            </label>
+                            <span className="badge badge-success">
+                                Registered
+                            </span>
+                        </div>
                     </div>
                 </div>
-
-                <div>
-                    <label className="block text-gray-500 text-xs text-transform uppercase">Degree</label>
-                    <div className="bg-gray-100 p-2 rounded text-gray-800 font-medium h-9 flex items-center">
-                        B.Tech
-                    </div>
-                </div>
-
-                <div>
-                    <label className="block text-gray-500 text-xs text-transform uppercase">Department</label>
-                    <div className="bg-gray-100 p-2 rounded text-gray-800 font-medium h-9 flex items-center">
-                        {user.department || "Computer Science and Engineering"}
-                    </div>
-                </div>
-
-                <div className="md:col-span-2">
-                    <label className="block text-gray-500 text-xs text-transform uppercase">Email</label>
-                    <div className="bg-gray-100 p-2 rounded text-gray-800 font-medium h-9 flex items-center">
-                        {user.email || "2023csb1094@iitrpr.ac.in"}
-                    </div>
-                </div>
-
-                <div>
-                    <label className="block text-gray-500 text-xs text-transform uppercase">Year-of-entry</label>
-                    <div className="bg-gray-100 p-2 rounded text-gray-800 font-medium h-9 flex items-center">
-                        {user.batch || "2023"}
-                    </div>
-                </div>
-
-                <div>
-                    <label className="block text-gray-500 text-xs text-transform uppercase">Current Status</label>
-                    <div className="bg-gray-100 p-2 rounded text-gray-800 font-medium h-9 flex items-center">
-                        Registered
-                    </div>
-                </div>
-
             </div>
         </div>
     );

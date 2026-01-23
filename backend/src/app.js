@@ -28,4 +28,9 @@ app.use("/admin", adminRoutes);
 app.use("/courses", courseRoutes);
 app.use("/departments", departmentRoutes);
 
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ error: "Something went wrong!", details: err.message });
+});
+
 export default app;

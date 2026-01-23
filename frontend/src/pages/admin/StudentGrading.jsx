@@ -45,74 +45,86 @@ export default function StudentGrading() {
     };
 
     // Must match grade_scale table in database
-    const gradeOptions = ["A", "A-", "B+", "B-", "C", "C-", "D", "F", "W"];
+    const gradeOptions = ["A", "A-", "B", "B-", "C", "C-", "D", "F", "W"];
 
     return (
-        <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100">
-            <h3 className="text-xl font-bold mb-4 text-gray-800 flex items-center gap-2">
+        <div className="w-full">
+            <h3 className="text-xl font-bold mb-6 text-gray-900 tracking-tight flex items-center gap-2">
                 <span>📝</span> Student Grading
             </h3>
 
             {/* Course Selection */}
-            <div className="mb-4">
+            <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-2">Select Course</label>
-                <select
-                    className="w-full p-2 border rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    onChange={(e) => {
-                        const off = offerings.find(o => o.id === +e.target.value);
-                        if (off) loadEnrollments(off);
-                    }}
-                    value={selectedOffering?.id || ""}
-                >
-                    <option value="">-- Select a Course --</option>
-                    {offerings.map(o => (
-                        <option key={o.id} value={o.id}>
-                            {o.courses?.course_code} - {o.courses?.course_name}
-                        </option>
-                    ))}
-                </select>
+                <div className="relative">
+                    <select
+                        className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-black focus:ring-0 outline-none transition-all duration-200 appearance-none cursor-pointer"
+                        onChange={(e) => {
+                            const off = offerings.find(o => o.id === +e.target.value);
+                            if (off) loadEnrollments(off);
+                        }}
+                        value={selectedOffering?.id || ""}
+                    >
+                        <option value="">-- Select a Course --</option>
+                        {offerings.map(o => (
+                            <option key={o.id} value={o.id}>
+                                {o.courses?.course_code} - {o.courses?.course_name}
+                            </option>
+                        ))}
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                </div>
             </div>
 
             {/* Enrollment List */}
             {selectedOffering && (
-                <div className="border rounded-lg overflow-hidden">
-                    <div className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white p-3">
-                        <h4 className="font-bold">{selectedOffering.courses?.course_code}: {selectedOffering.courses?.course_name}</h4>
-                        <p className="text-sm opacity-90">Faculty: {selectedOffering.faculty?.users?.name}</p>
+                <div className="border border-gray-100 rounded-xl overflow-hidden shadow-soft">
+                    <div className="bg-gray-50/50 p-4 border-b border-gray-100 flex justify-between items-center">
+                        <div>
+                            <h4 className="font-bold text-gray-900 text-lg flex items-center gap-2">
+                                {selectedOffering.courses?.course_name}
+                                <span className="text-xs bg-black text-white px-2 py-0.5 rounded font-bold">{selectedOffering.courses?.course_code}</span>
+                            </h4>
+                            <p className="text-sm text-gray-500 mt-1">Faculty: {selectedOffering.faculty?.users?.name}</p>
+                        </div>
                     </div>
 
                     {loading ? (
-                        <p className="p-4 text-gray-500 text-center">Loading students...</p>
+                         <div className="flex justify-center items-center h-48 bg-white">
+                            <div className="w-8 h-8 border-4 border-gray-100 border-t-black rounded-full animate-spin" />
+                        </div>
                     ) : enrollments.length === 0 ? (
-                        <p className="p-4 text-gray-500 text-center italic">No enrolled students found.</p>
+                        <div className="p-12 text-center text-gray-400 font-medium italic bg-white">No enrolled students found.</div>
                     ) : (
-                        <div className="max-h-64 overflow-y-auto">
+                        <div className="max-h-96 overflow-y-auto bg-white">
                             <table className="w-full text-sm">
-                                <thead className="bg-gray-50 sticky top-0">
-                                    <tr className="text-xs text-gray-500 uppercase">
-                                        <th className="px-4 py-2 text-left">Roll No</th>
-                                        <th className="px-4 py-2 text-left">Name</th>
-                                        <th className="px-4 py-2 text-left">Status</th>
-                                        <th className="px-4 py-2 text-center">Action</th>
+                                <thead className="bg-gray-50 sticky top-0 z-10 border-b border-gray-100">
+                                    <tr className="text-xs text-gray-400 uppercase tracking-wider font-bold">
+                                        <th className="px-6 py-4 text-left">Roll No</th>
+                                        <th className="px-6 py-4 text-left">Name</th>
+                                        <th className="px-6 py-4 text-left">Status</th>
+                                        <th className="px-6 py-4 text-right">Action</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody className="divide-y divide-gray-50">
                                     {enrollments.map((e, i) => (
-                                        <tr key={i} className="border-b hover:bg-gray-50">
-                                            <td className="px-4 py-2 font-mono text-gray-700">{e.students?.roll_number}</td>
-                                            <td className="px-4 py-2">{e.students?.user?.name}</td>
-                                            <td className="px-4 py-2">
-                                                <span className={`px-2 py-0.5 rounded text-xs capitalize ${e.status === 'enrolled' ? 'bg-green-100 text-green-800' :
-                                                    e.status === 'rejected' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'
+                                        <tr key={i} className="hover:bg-gray-50/50 transition-colors">
+                                            <td className="px-6 py-4 font-mono font-bold text-gray-600">{e.students?.roll_number}</td>
+                                            <td className="px-6 py-4 font-medium text-gray-900">{e.students?.user?.name}</td>
+                                            <td className="px-6 py-4">
+                                                <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide inline-block ${e.status === 'enrolled' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' :
+                                                    e.status === 'rejected' ? 'bg-red-50 text-red-700 border border-red-100' : 'bg-amber-50 text-amber-700 border border-amber-100'
                                                     }`}>
                                                     {e.status?.replace('_', ' ')}
                                                 </span>
                                             </td>
-                                            <td className="px-4 py-2 text-center">
+                                            <td className="px-6 py-4 text-right">
                                                 {e.status === 'enrolled' && (
                                                     <button
                                                         onClick={() => { setGrading(e); setSelectedGrade(""); }}
-                                                        className="bg-indigo-600 text-white px-3 py-1 rounded text-xs hover:bg-indigo-700 transition"
+                                                        className="bg-black text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-gray-800 transition shadow-sm active:translate-y-0.5"
                                                     >
                                                         Grade
                                                     </button>
@@ -129,39 +141,51 @@ export default function StudentGrading() {
 
             {/* Grading Modal */}
             {grading && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50" onClick={() => setGrading(null)}>
-                    <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6" onClick={e => e.stopPropagation()}>
-                        <h3 className="text-xl font-bold text-gray-800 mb-1">Assign Grade</h3>
-                        <p className="text-sm text-gray-500 mb-4">
-                            {selectedOffering?.courses?.course_code} - {grading.students?.user?.name} ({grading.students?.roll_number})
-                        </p>
-
-                        <div className="grid grid-cols-3 gap-2 mb-6">
-                            {gradeOptions.map(grade => (
-                                <button
-                                    key={grade}
-                                    onClick={() => setSelectedGrade(grade)}
-                                    className={`p-3 rounded-lg font-bold text-lg transition-all ${selectedGrade === grade
-                                        ? 'bg-indigo-600 text-white scale-105 shadow-lg'
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                        }`}
-                                >
-                                    {grade}
-                                </button>
-                            ))}
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in" onClick={() => setGrading(null)}>
+                    <div className="bg-white rounded-2xl shadow-strong max-w-sm w-full p-6 animate-scale-in" onClick={e => e.stopPropagation()}>
+                        <div className="flex justify-between items-start mb-6">
+                            <h3 className="text-xl font-bold text-gray-900">Assign Grade</h3>
+                            <button onClick={() => setGrading(null)} className="text-gray-400 hover:text-gray-600">
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
+                        </div>
+                        
+                        <div className="mb-6 bg-gray-50 rounded-xl p-4 border border-gray-100">
+                            <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-1">Student</p>
+                            <p className="text-gray-900 font-bold text-lg">{grading.students?.user?.name}</p>
+                            <p className="text-gray-500 font-mono text-sm">{grading.students?.roll_number}</p>
                         </div>
 
-                        <div className="flex gap-3">
+                        <div className="mb-6">
+                            <label className="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">Select Grade</label>
+                            <div className="grid grid-cols-3 gap-3">
+                                {gradeOptions.map(grade => (
+                                    <button
+                                        key={grade}
+                                        onClick={() => setSelectedGrade(grade)}
+                                        className={`py-2.5 rounded-lg font-bold text-sm transition-all duration-200 border
+                                            ${selectedGrade === grade
+                                                ? 'bg-black text-white border-black shadow-md transform -translate-y-0.5'
+                                                : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400 hover:text-gray-900'
+                                            }`}
+                                    >
+                                        {grade}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="flex gap-3 pt-2">
                             <button
                                 onClick={() => setGrading(null)}
-                                className="flex-1 py-2 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50"
+                                className="flex-1 py-3 rounded-xl font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 transition-colors"
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={submitGrade}
                                 disabled={!selectedGrade}
-                                className="flex-1 py-2 rounded-lg bg-indigo-600 text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-indigo-700"
+                                className="flex-1 py-3 rounded-xl font-bold text-white bg-black hover:bg-gray-800 transition-colors shadow-soft disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none"
                             >
                                 Submit Grade
                             </button>

@@ -2,68 +2,80 @@ import { useState } from "react";
 import Navbar from "../../components/Navbar.jsx";
 import StudentProfileHeader from "./StudentProfileHeader.jsx";
 import StudentAcademics from "./StudentAcademics.jsx";
-import Offerings from "./Offerings.jsx";
 import GPAView from "./GPAView.jsx";
+import Offerings from "./Offerings.jsx";
+import MeetingScheduler from "../../components/MeetingScheduler.jsx";
+import StudentDocuments from "../../components/StudentDocuments.jsx";
+
 
 export default function StudentDashboard() {
     const [activeTab, setActiveTab] = useState("academics");
 
+    const tabs = [
+        { id: "academics", label: "Academics", icon: "📚" },
+        { id: "gpa", label: "GPA", icon: "📊" },
+        { id: "meetings", label: "Faculty Meetings", icon: "👥" },
+        { id: "documents", label: "Documents", icon: "📄" },
+    ];
+
     return (
-        <div className="min-h-screen bg-gray-50 font-sans text-gray-900">
+        <div className="min-h-screen bg-gray-50">
             <Navbar title="AIMS Student Portal" />
 
-            <main className="max-w-7xl mx-auto py-6 px-4">
+            <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
 
                 <StudentProfileHeader />
 
-                {/* Tabs */}
-                <div className="flex gap-2 mb-4 border-b border-gray-200">
-                    <button
-                        onClick={() => setActiveTab("academics")}
-                        className={`px-4 py-2 text-sm font-bold border-t border-x rounded-t transition-colors ${activeTab === "academics"
-                            ? "bg-white border-b-white text-blue-600 -mb-px z-10"
-                            : "bg-gray-100 text-gray-500 hover:bg-gray-200"
-                            }`}
-                    >
-                        Academics
-                    </button>
-                    <button
-                        onClick={() => setActiveTab("gpa")}
-                        className={`px-4 py-2 text-sm font-bold border-t border-x rounded-t transition-colors ${activeTab === "gpa"
-                            ? "bg-white border-b-white text-blue-600 -mb-px z-10"
-                            : "bg-gray-100 text-gray-500 hover:bg-gray-200"
-                            }`}
-                    >
-                        GPA
-                    </button>
-                    <button
-                        onClick={() => setActiveTab("documents")}
-                        className={`px-4 py-2 text-sm font-bold border-t border-x rounded-t transition-colors ${activeTab === "documents"
-                            ? "bg-white border-b-white text-blue-600 -mb-px z-10"
-                            : "bg-gray-100 text-gray-500 hover:bg-gray-200"
-                            }`}
-                    >
-                        Documents
-                    </button>
+                {/* Modern Tab Navigation */}
+                <div className="mb-6">
+                    <div className="border-b border-gray-200">
+                        <nav className="flex space-x-1" aria-label="Tabs">
+                            {tabs.map((tab) => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveTab(tab.id)}
+                                    className={`
+                                        px-6 py-3 text-sm font-medium rounded-t-lg transition-all duration-200
+                                        ${activeTab === tab.id
+                                            ? "bg-white text-black border-t-2 border-x border-black -mb-px"
+                                            : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+                                        }
+                                    `}
+                                >
+                                    <span className="mr-2">{tab.icon}</span>
+                                    {tab.label}
+                                </button>
+                            ))}
+                        </nav>
+                    </div>
                 </div>
 
-                <div className="bg-white p-4 border rounded-b shadow-sm min-h-[500px]">
+                {/* Tab Content */}
+                <div className="card p-6 min-h-[500px] animate-fadeIn">
                     {activeTab === "academics" && (
-                        <div className="space-y-8 animate-fadeIn">
+                        <div className="space-y-8">
                             <StudentAcademics />
-                            <Offerings />
+                            <div className="border-t pt-8">
+                                <Offerings />
+                            </div>
                         </div>
                     )}
 
                     {activeTab === "gpa" && (
-                        <div className="animate-fadeIn">
+                        <div>
                             <GPAView />
                         </div>
                     )}
 
+                    {activeTab === "meetings" && (
+                        <div>
+                            <MeetingScheduler userRole="student" />
+                        </div>
+                    )}
+
                     {activeTab === "documents" && (
-                        <div className="p-8 text-center text-gray-500">
-                            <p>No documents available.</p>
+                        <div>
+                            <StudentDocuments />
                         </div>
                     )}
                 </div>
