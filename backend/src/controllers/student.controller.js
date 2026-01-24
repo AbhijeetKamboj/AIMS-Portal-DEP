@@ -208,7 +208,7 @@ export const getTranscript = async (req, res) => {
             }
         });
 
-        // Construct Final Response
+        // Construct Final Response - use registered_credits (enrolled + pending) for display
         const response = {
             student_info: {
                 name: student.user.name,
@@ -217,7 +217,10 @@ export const getTranscript = async (req, res) => {
                 department: student.department,
                 batch: student.batch
             },
-            semesters: semesters.reverse()
+            semesters: semesters.map(sem => ({
+                ...sem,
+                credits: sem.registered_credits  // Show all registered credits (enrolled + pending), not just completed
+            })).reverse()
         };
 
         res.json(response);
