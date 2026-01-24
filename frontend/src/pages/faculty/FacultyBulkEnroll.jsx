@@ -121,6 +121,15 @@ export default function FacultyBulkEnroll() {
                     </button>
                 </div>
 
+                {/* Info Message */}
+                <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-800">
+                    <p className="font-semibold mb-1">Important:</p>
+                    <ul className="list-disc list-inside space-y-1">
+                        <li>Students with <span className="font-semibold">rejected status</span> will not be enrolled</li>
+                        <li>Students who have sent <span className="font-semibold">approval requests</span> will continue through the regular faculty and advisor approval process and will not be affected by bulk approval</li>
+                    </ul>
+                </div>
+
                 {inputMethod === "manual" ? (
                     <>
                         <div className="flex justify-between items-end mb-2">
