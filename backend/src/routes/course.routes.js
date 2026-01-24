@@ -22,10 +22,10 @@ router.use(authMiddleware);
 // Public (Authenticated)
 router.get("/offerings", getApprovedOfferings);
 router.get("/list", getCourses);
-router.get("/:id", getCourseById);
 router.get("/semesters", getSemesters);
 router.get("/offered-courses", getOfferedCourses);
 router.get("/enrollments", getCourseEnrollments);
+router.get("/:id", getCourseById);
 
 // Admin Routes
 router.post("/create", requireRole(["faculty", "admin"]), createCourse);
