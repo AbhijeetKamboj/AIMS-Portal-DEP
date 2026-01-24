@@ -47,6 +47,9 @@ export default function ManageUsers() {
             // Transform data based on format
             const transformedUsers = data.map((row) => {
                 const user = { ...row };
+                // Set role_id based on userType: 1=Student, 2=Faculty
+                user.role_id = userType === "student" ? 1 : 2;
+                
                 // Convert role_id if present
                 if (user.role_id) {
                     user.role_id = parseInt(user.role_id);
