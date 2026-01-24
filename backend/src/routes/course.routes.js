@@ -19,19 +19,21 @@ const router = express.Router();
 
 router.use(authMiddleware);
 
-// Public (Authenticated)
+// Public (Authenticated) - Specific routes first
 router.get("/offerings", getApprovedOfferings);
 router.get("/list", getCourses);
 router.get("/semesters", getSemesters);
 router.get("/offered-courses", getOfferedCourses);
 router.get("/enrollments", getCourseEnrollments);
-router.get("/:id", getCourseById);
 
-// Admin Routes
+// Admin Routes - Specific routes before generic :id
+router.get("/all-offerings", requireRole("admin"), getAllOfferings);
 router.post("/create", requireRole(["faculty", "admin"]), createCourse);
 router.post("/approve-offering", requireRole("admin"), approveOffering);
 router.post("/approve-catalog", requireRole("admin"), approveCourseCatalog);
-router.get("/all-offerings", requireRole("admin"), getAllOfferings);
+
+// Generic route - MUST be last
+router.get("/:id", getCourseById);
 
 // Faculty Routes
 router.post("/offer", requireRole("faculty"), offerCourse);
