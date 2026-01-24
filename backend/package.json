@@ -6,11 +6,13 @@
     "dev": "nodemon src/server.js"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@supabase/supabase-js": "^2.39.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.1",
     "express": "^4.19.2",
-    "googleapis": "^170.1.0"
+    "googleapis": "^170.1.0",
+    "pdf-parse": "^2.4.5"
   },
   "devDependencies": {
     "nodemon": "^3.0.3"

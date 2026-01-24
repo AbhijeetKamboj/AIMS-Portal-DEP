@@ -5,6 +5,11 @@ import StudentAcademics from "./StudentAcademics.jsx";
 import GPAView from "./GPAView.jsx";
 import Offerings from "./Offerings.jsx";
 import MeetingScheduler from "../../components/MeetingScheduler.jsx";
+// <<<<<<< HEAD
+// =======
+import StudentDocuments from "../../components/StudentDocuments.jsx";
+import StudentChatbot from "./StudentChatbot.jsx";
+// >>>>>>> 41c5573 (Chatbot and minor fixes)
 
 
 export default function StudentDashboard() {
@@ -77,6 +82,7 @@ export default function StudentDashboard() {
                 </div>
 
             </main>
+            <StudentChatbot />
         </div>
     );
 }

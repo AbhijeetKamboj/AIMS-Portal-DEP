@@ -5,6 +5,7 @@ import facultyRoutes from "./routes/faculty.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import courseRoutes from "./routes/course.routes.js";
 import departmentRoutes from "./routes/department.routes.js";
+import chatRoutes from "./routes/chat.js";
 import cors from "cors";
 // import dotenv from "dotenv";
 
@@ -27,6 +28,7 @@ app.use("/faculty", facultyRoutes);
 app.use("/admin", adminRoutes);
 app.use("/courses", courseRoutes);
 app.use("/departments", departmentRoutes);
+app.use("/chat", chatRoutes);
 
 app.use((err, req, res, next) => {
     console.error(err.stack);
