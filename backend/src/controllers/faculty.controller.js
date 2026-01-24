@@ -4,12 +4,30 @@ import { supabaseAdmin } from "../config/supabaseAdmin.js";
 export const submitGrade = async (req, res) => {
     const { student_id, offering_id, grade, attempt } = req.body;
 
+    // Validate and normalize grade
+    if (!grade || typeof grade !== 'string') {
+        return res.status(400).json({ error: "Grade is required and must be a string" });
+    }
+
+    const normalizedGrade = grade.trim().toUpperCase();
+
+    // Validate grade exists in grade_scale
+    const { data: validGrade } = await supabaseAdmin
+        .from("grade_scale")
+        .select("grade")
+        .eq("grade", normalizedGrade)
+        .single();
+
+    if (!validGrade) {
+        return res.status(400).json({ error: `Invalid grade: '${normalizedGrade}'. Valid grades are: A, A-, B, B-, C, C-, D, F, W` });
+    }
+
     const { error } = await supabaseAdmin
         .from("grades")
         .upsert({
             student_id,
             offering_id,
-            grade,
+            grade: normalizedGrade,
             attempt,
             status: 'pending',
             submitted_at: new Date().toISOString()
@@ -45,6 +63,28 @@ export const uploadGrades = async (req, res) => {
     for (const item of grades) {
         const { roll_number, grade } = item;
         try {
+            // Validate grade first
+            if (!grade || typeof grade !== 'string') {
+                results.failed++;
+                results.errors.push({ roll_number, error: "Grade is required and must be a string" });
+                continue;
+            }
+
+            const trimmedGrade = grade.trim().toUpperCase();
+
+            // Validate grade exists in grade_scale
+            const { data: validGrade } = await supabaseAdmin
+                .from("grade_scale")
+                .select("grade")
+                .eq("grade", trimmedGrade)
+                .single();
+
+            if (!validGrade) {
+                results.failed++;
+                results.errors.push({ roll_number, error: `Invalid grade: '${trimmedGrade}'. Valid: A, A-, B, B-, C, C-, D, F, W` });
+                continue;
+            }
+
             const { data: student } = await supabaseAdmin
                 .from("students")
                 .select("user_id")
@@ -63,7 +103,7 @@ export const uploadGrades = async (req, res) => {
                 .upsert({
                     student_id: student.user_id,
                     offering_id,
-                    grade,
+                    grade: trimmedGrade,
                     status: 'pending',
                     submitted_at: new Date().toISOString()
                 }, { onConflict: 'student_id, offering_id' }); // Conflict on unique constraint
