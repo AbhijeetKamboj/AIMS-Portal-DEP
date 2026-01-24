@@ -48,7 +48,7 @@ export const uploadGrades = async (req, res) => {
             const { data: student } = await supabaseAdmin
                 .from("students")
                 .select("user_id")
-                .eq("roll_number", roll_number.trim())
+                .ilike("roll_number", roll_number.trim())
                 .single();
 
             if (!student) {
@@ -200,7 +200,7 @@ export const directEnroll = async (req, res) => {
     const { data: student, error: sErr } = await supabaseAdmin
         .from("students")
         .select("user_id")
-        .eq("roll_number", roll_number)
+        .ilike("roll_number", roll_number)
         .single();
 
     if (sErr || !student) return res.status(404).json({ error: "Student not found" });
@@ -452,7 +452,21 @@ export const respondMeeting = async (req, res) => {
         .update(updates)
         .eq("id", request_id);
 
-    if (error) return res.status(400).json({ error: error.message });
+    // Handle schema cache errors - if google_event_id column not in schema cache, retry or skip
+    if (error && error.message?.includes("google_event_id")) {
+        console.warn("Schema cache stale, retrying update without google_event_id");
+        // Remove google_event_id from updates and try again
+        const { google_event_id, ...safeUpdates } = updates;
+        const { error: retryError } = await supabaseAdmin
+            .from("meeting_requests")
+            .update(safeUpdates)
+            .eq("id", request_id);
+        
+        if (retryError) return res.status(400).json({ error: retryError.message });
+    } else if (error) {
+        return res.status(400).json({ error: error.message });
+    }
+
     res.json({ message: "Meeting request updated" });
 };
 
