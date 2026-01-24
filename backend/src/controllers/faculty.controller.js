@@ -485,11 +485,11 @@ export const bulkEnroll = async (req, res) => {
     const results = { success: 0, failed: 0, errors: [] };
 
     for (const roll_number of roll_numbers) {
-        // Resolve student ID
+        // Resolve student ID (case-insensitive)
         const { data: student } = await supabaseAdmin
             .from("students")
             .select("user_id")
-            .eq("roll_number", roll_number.trim())
+            .ilike("roll_number", roll_number.trim())
             .single();
 
         if (!student) {
