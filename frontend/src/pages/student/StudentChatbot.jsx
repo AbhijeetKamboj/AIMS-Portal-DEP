@@ -119,6 +119,6 @@ export default function StudentChatbot() {
       >
         <FaRobot size={22} />
       </button>
-    </div>
+    </div> 
   );
 }
