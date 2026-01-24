@@ -172,21 +172,21 @@ export const uploadGrades = async (req, res) => {
 export const assignAdvisor = async (req, res) => {
     const { student_roll, faculty_email } = req.body;
 
-    // 1. Find Student
+    // 1. Find Student (case-insensitive)
     const { data: student, error: sErr } = await supabaseAdmin
         .from("students")
         .select("user_id")
-        .eq("roll_number", student_roll)
+        .ilike("roll_number", student_roll)
         .single();
 
     if (sErr || !student) return res.status(404).json({ error: "Student not found" });
 
-    // 2. Find Faculty
+    // 2. Find Faculty (case-insensitive)
     // Join with users because email is in users table, but filtering by role faculty is good practice or just assume email is unique
     const { data: facultyUser, error: fErr } = await supabaseAdmin
         .from("users")
         .select("id")
-        .eq("email", faculty_email)
+        .ilike("email", faculty_email)
         .single();
 
     if (fErr || !facultyUser) return res.status(404).json({ error: "Faculty user not found" });
@@ -294,20 +294,20 @@ export const bulkAssignAdvisors = async (req, res) => {
     for (const item of assignments) {
         try {
             // Reuse logic? Or optimized batch? Loop for now.
-            // 1. Find Student
+            // 1. Find Student (case-insensitive)
             const { data: student, error: sErr } = await supabaseAdmin
                 .from("students")
                 .select("user_id")
-                .eq("roll_number", item.student_roll)
+                .ilike("roll_number", item.student_roll)
                 .single();
 
             if (sErr || !student) throw new Error(`Student ${item.student_roll} not found`);
 
-            // 2. Find Faculty
+            // 2. Find Faculty (case-insensitive)
             const { data: facultyUser, error: fErr } = await supabaseAdmin
                 .from("users")
                 .select("id")
-                .eq("email", item.faculty_email)
+                .ilike("email", item.faculty_email)
                 .single();
 
             if (fErr || !facultyUser) throw new Error(`Faculty ${item.faculty_email} not found`);
