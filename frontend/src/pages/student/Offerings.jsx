@@ -211,7 +211,7 @@ export default function Offerings() {
                              statusBadge = <span className="px-3 py-1 bg-red-100 text-red-800 text-xs font-bold uppercase rounded-full tracking-wide">Rejected</span>;
                              actionBtn = (
                                 <button disabled className="px-6 py-2.5 bg-red-50 text-red-700 border border-red-100 rounded-lg text-sm font-bold opacity-75 cursor-default">
-                                    Not Allowed
+                                    Rejected
                                 </button>
                             );
                         } else {
