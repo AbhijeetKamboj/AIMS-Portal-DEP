@@ -234,21 +234,40 @@ export const bulkCreateUsers = async (req, res) => {
 
             // Insert into specific role table
             if (user.role_id == 1) { // Student
+                console.log("Creating student with data:", {
+                    user_id: authUser.id,
+                    roll_number: user.roll_number,
+                    department: user.department,
+                    batch: user.batch
+                });
+                
                 const { error } = await supabaseAdmin.from("students").insert({
                     user_id: authUser.id,
                     roll_number: user.roll_number,
                     department: user.department,
                     batch: user.batch
                 });
-                if (error) throw error;
+                if (error) {
+                    console.error("Student insert error:", error);
+                    throw error;
+                }
 
             } else if (user.role_id == 2) { // Faculty
+                console.log("Creating faculty with data:", {
+                    user_id: authUser.id,
+                    employee_id: user.employee_id,
+                    department: user.department
+                });
+                
                 const { error } = await supabaseAdmin.from("faculty").insert({
                     user_id: authUser.id,
                     employee_id: user.employee_id,
                     department: user.department
                 });
-                if (error) throw error;
+                if (error) {
+                    console.error("Faculty insert error:", error);
+                    throw error;
+                }
             }
 
             results.success++;
