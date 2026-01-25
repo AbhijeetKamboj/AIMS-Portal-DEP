@@ -41,33 +41,26 @@ export default function Login() {
 
   // Password login
   const loginWithPassword = async () => {
-    console.log("LOGIN: button pressed");
-  
     if (!email || !password) {
-      alert("Email and password required");
+      Alert.alert("Error", "Email and password required");
       return;
     }
-  
+
     setLoading(true);
-    console.log("LOGIN: calling /auth/login/password");
-  
-    const res = await apiFetch("/auth/login/password", "POST", {
+
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
-  
-    console.log("LOGIN: response =", res);
-  
-    if (res?.error) {
-      alert(res.error);
+
+    if (error) {
+      Alert.alert("Login Failed", error.message);
       setLoading(false);
       return;
     }
-  
-    console.log("LOGIN: calling handlePostLogin");
-    await handlePostLogin(res.session);
+
+    await handlePostLogin(data.session);
   };
-  
 
   // Send OTP
   const sendOtp = async () => {
@@ -122,25 +115,20 @@ export default function Login() {
 
   // Common post-login handler
   const handlePostLogin = async (session) => {
-    console.log("POST LOGIN: session =", session);
-  
-    console.log("POST LOGIN: fetching role");
-    const roleRes = await getMyRole();
-    console.log("POST LOGIN: role response =", roleRes);
-  
-    if (!roleRes?.role) {
-      alert("Role not found. Contact admin.");
-      setLoading(false);
-      return;
+    try {
+      const roleRes = await getMyRole();
+
+      if (!roleRes?.role) {
+        Alert.alert("Error", "Role not found. Contact admin.");
+        setLoading(false);
+        return;
+      }
+
+      await login(session, roleRes.role);
+    } finally {
+      setLoading(false); 
     }
-  
-    console.log("POST LOGIN: saving session + role");
-    await login(session, roleRes.role);
-  
-    console.log("POST LOGIN: done");
-    setLoading(false);
   };
-  
 
   const switchMethod = (method) => {
     setLoginMethod(method);
