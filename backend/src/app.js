@@ -17,6 +17,7 @@ app.use(
       origin: [
         "http://localhost:5173", 
         "http://localhost:8081",
+        "https://aims-dep-frontend-webapp.vercel.app",
       ],
       credentials: true,
       methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
