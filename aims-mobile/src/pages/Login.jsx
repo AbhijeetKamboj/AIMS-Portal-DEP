@@ -116,19 +116,33 @@ export default function Login() {
   // Common post-login handler
   const handlePostLogin = async (session) => {
     try {
+      // Save session immediately
+      await login(session, null);
+  
+      // Fetch role AFTER token is stored
       const roleRes = await getMyRole();
-
+  
       if (!roleRes?.role) {
-        Alert.alert("Error", "Role not found. Contact admin.");
-        setLoading(false);
+        Alert.alert(
+          "Access Error",
+          "Your account exists but no role is assigned.\nContact admin."
+        );
         return;
       }
-
+  
+      // Update role in context
       await login(session, roleRes.role);
-    } finally {
-      setLoading(false); 
+  
+      // Navigate based on role
+      if (roleRes.role === "student") navigation.replace("Student");
+      else if (roleRes.role === "faculty") navigation.replace("Faculty");
+      else if (roleRes.role === "admin") navigation.replace("Admin");
+  
+    } catch (e) {
+      Alert.alert("Login Error", "Something went wrong");
     }
   };
+  
 
   const switchMethod = (method) => {
     setLoginMethod(method);
