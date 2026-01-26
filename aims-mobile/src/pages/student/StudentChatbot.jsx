@@ -24,17 +24,21 @@ export default function StudentChatbot() {
 
   const panResponder = useRef(
     PanResponder.create({
-      onMoveShouldSetPanResponder: () => true,
+      onStartShouldSetPanResponder: () => false, // 👈 allow tap
+      onMoveShouldSetPanResponder: (_, gesture) =>
+        Math.abs(gesture.dx) > 5 || Math.abs(gesture.dy) > 5, // 👈 drag only
+  
       onPanResponderMove: Animated.event(
         [null, { dx: pan.x, dy: pan.y }],
         { useNativeDriver: false }
       ),
+  
       onPanResponderRelease: () => {
         pan.extractOffset();
       },
     })
   ).current;
-
+  
   /* ---------------- CHAT LOGIC ---------------- */
 
   const sendMessage = async () => {
