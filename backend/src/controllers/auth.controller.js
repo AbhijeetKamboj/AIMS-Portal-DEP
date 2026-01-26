@@ -67,9 +67,9 @@ export const googleAuthCallback = async (req, res) => {
     try {
         await handleCallback(code, state); // state is userId
         // Redirect back to frontend
-        res.redirect("http://localhost:5173/faculty?calendar=connected");
+        res.redirect("https://aims-dep-frontend-webapp.vercel.app/faculty?calendar=connected");
     } catch (error) {
         console.error("Google Auth Error:", error);
-        res.redirect("http://localhost:5173/faculty?calendar=failed");
+        res.redirect("https://aims-dep-frontend-webapp.vercel.app/faculty?calendar=failed");
     }
 };
