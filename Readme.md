@@ -47,10 +47,10 @@ Before starting, ensure the following are installed:
 PORT=5050
 SUPABASE_URL=https://xxxx.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-GOOGLE_CLIENT_ID=420111702556-8chhksq3dkk16rljtou5upjgutgsc1pc.apps.googleusercontent.com
-GOOGLE_CLIENT_SECRET=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
-GOOGLE_REDIRECT_URI=http://localhost:5050/auth/google/callback
-GEMINI_API_KEY=AIzaSyCkJa7LWwM0KKnVPklzUherAfA63TZ6ceA
+GOOGLE_CLIENT_ID=###########
+GOOGLE_CLIENT_SECRET=#########3
+GOOGLE_REDIRECT_URI=http:##########3
+GEMINI_API_KEY=#########3
 ```
 
 ### Web App (`frontend/.env`)
@@ -67,8 +67,8 @@ EXPO_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
 EXPO_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
 ```
 
-> **Replace `<YOUR_LAN_IP>`** with your local network IP address.  
-> Example: `http://192.168.1.3:5050` 
+> **Replace `<YOUR_LAN_IP>`** with your local network IP address.
+> use ifconfig/ipconfig 
 
 ---
 
