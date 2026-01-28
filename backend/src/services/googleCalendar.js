@@ -79,11 +79,11 @@ export const createEvent = async (userId, meetingDetails) => {
                 description: meetingDetails.reason,
                 start: {
                     dateTime: meetingDetails.start_time,
-                    timeZone: 'UTC'
+                    timeZone: 'Asia/Kolkata'
                 },
                 end: {
                     dateTime: meetingDetails.end_time,
-                    timeZone: 'UTC'
+                    timeZone: 'Asia/Kolkata'
                 },
             }
         });
